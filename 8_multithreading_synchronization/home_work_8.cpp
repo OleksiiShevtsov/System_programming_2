@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <windows.h>
 #include <cstdlib>
 #include <ctime>
@@ -8,20 +9,19 @@ using namespace std;
 
 CRITICAL_SECTION criticalSection;
 
-DWORD WINAPI ThreadStart(void* dataArrey) {
+class Gamble;
+
+DWORD WINAPI ThreadStart(void* param) {
 		
-	static_cast<char*>(dataArrey);	
-		
-	cout << *(int*)dataArrey << endl;
+	EnterCriticalSection(&criticalSection);	
 	
-		for(int i = sizeof(int); i < 6; i++){
-			
-			cout << *dataArrey + i << endl;
-			
-		}
+	Gamble* gamble = static_cast<Gamble*>(param);	
 		
-	EnterCriticalSection(&criticalSection);
-		
+	cout << gamble->m_dataPrediction.predictionsValue << endl;
+	//cout << gamble->name << endl;
+	
+	
+
 	LeaveCriticalSection(&criticalSection);
 		
 	return 0;
@@ -33,24 +33,29 @@ public:
 	Gamble(){
 		srand(static_cast<unsigned int>(time(0)));
 		m_hiddenNumber = rand() % 100 + 1;
-		cout << m_hiddenNumber << endl;
 	}
 	
-	void MakePrediction(std::string userName, int prediction){
+	void MakePrediction(char* userName, int prediction){
 		
-		char dataArrey[sizeof(userName) + sizeof(prediction)];
+		m_dataPrediction.predictionsValue = prediction;
+		m_dataPrediction.name = userName;
 		
-		*(int*)dataArrey = prediction;
-		
-		for(int i = sizeof(prediction); i < sizeof(userName); i++){
-			dataArrey[i] = userName[i - sizeof(prediction)];
-		}
-		
-		HANDLE thread = CreateThread(0, 0, ThreadStart, dataArrey, 0, 0);
+		HANDLE thread = CreateThread(0, 0, ThreadStart, this, 0, 0);
+	}
+	
+	struct DataPrediction{
+		int predictionsValue;
+		char* name;
+	} m_dataPrediction;
+	
+	void setPredictions(char* userName, int prediction){
+		m_predictions.insert( std::pair<char*, int>(userName, prediction) );
 	}
 	
 private:
-	std::map<std::string, int> m_prediction;
+	
+	std::map<std::string, int> m_predictions;
+	
 	int m_hiddenNumber; 
 };
 
@@ -61,7 +66,10 @@ int main() {
 	Gamble gamble;
 	gamble.MakePrediction("Alex", 12);
 
-	DeleteCriticalSection(&criticalSection);
 
+	
+	Sleep(2000);
+	DeleteCriticalSection(&criticalSection);
+	
 	return 0;
 }
