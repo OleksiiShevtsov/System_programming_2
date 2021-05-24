@@ -28,7 +28,8 @@ int main() {
 	thread[0] = CreateThread(0, 0, ThreadStart, 0, 0, 0);
 	thread[1] = CreateThread(0, 0, ThreadStart, 0, 0, 0);
 	
- 	WaitForMultipleObjects(std::size(thread), thread, TRUE, INFINITE);
+	Sleep(100);
+	WaitForSingleObject(mutex, INFINITE);
 	
 	for(int i = 0; i < 10; i++){
 		cout << "main" << endl;
