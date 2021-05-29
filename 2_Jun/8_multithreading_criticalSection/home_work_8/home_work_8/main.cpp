@@ -1,10 +1,11 @@
 #include <iostream>
-#include <string>
 #include <windows.h>
 #include <cstdlib>
 #include <ctime>
-#include <map>
+#include <chrono>
 #include <cmath>
+#include <string>
+#include <map>
 
 using namespace std;
 
@@ -12,19 +13,27 @@ CRITICAL_SECTION criticalSection;
 
 DWORD WINAPI ThreadStart(void* param);
 
+class Gamble;
+
 struct DataPrediction {
-	int predictionsValue;
-	const char* name;
+	int predictionsValue = 0;
+	const char* name = "";
+	void(Gamble::*setPredictions)(const char* name, int predictionsValue);
 };
 
 class Gamble {
 
 public:
 
+	void setPredictions(const char* userName, int prediction) {
+		m_predictions.insert(std::pair<const char*, int>(userName, prediction));
+	}
+
 	Gamble() {
 		srand(static_cast<unsigned int>(time(0)));
 		m_hiddenNumber = rand() % 20 + 1;
 		std::cout << "prediction: " << m_hiddenNumber << std::endl;
+		m_dataPrediction.setPredictions = setPredictions;
 	}
 
 	void MakePrediction(const char* userName, int prediction) {
@@ -32,11 +41,7 @@ public:
 		m_dataPrediction.predictionsValue = prediction;
 		m_dataPrediction.name = userName;
 
-		HANDLE thread = CreateThread(0, 0, ThreadStart, this, 0, 0);
-	}
-
-	void setPredictions(const char* userName, int prediction) {
-		m_predictions.insert(std::pair<const char*, int>(userName, prediction));
+		HANDLE thread = CreateThread(0, 0, ThreadStart, &m_dataPrediction, 0, 0);
 	}
 
 	void findAnAccuratePrediction() {
@@ -59,7 +64,9 @@ public:
 				bestPrediction.second = iter->second;
 			}
 		}
-		bestPredictions.insert(bestPrediction);
+		if (m_predictions.size() != 0) {
+			bestPredictions.insert(bestPrediction);
+		}
 		for (auto iter = m_predictions.begin(); iter != m_predictions.end(); iter++) {
 			if (iter->second == bestPrediction.second) {
 				bestPredictions.insert(*iter);
@@ -88,10 +95,11 @@ private:
 DWORD WINAPI ThreadStart(void* param) {
 	EnterCriticalSection(&criticalSection);
 
-		Gamble* gamble = static_cast<Gamble*>(param);
-		int value = gamble->m_dataPrediction.predictionsValue;
-		const char* name = gamble->m_dataPrediction.name;
-		gamble->setPredictions(name, value);
+	    DataPrediction* dataPrediction = static_cast<DataPrediction*>(param);
+		int value = dataPrediction->predictionsValue;
+		const char* name = dataPrediction->name;
+
+	    dataPrediction->setPredictions(name, value);
 
 	LeaveCriticalSection(&criticalSection);
 
@@ -101,27 +109,44 @@ DWORD WINAPI ThreadStart(void* param) {
 int main() {
 
 	InitializeCriticalSection(&criticalSection);
-
 	Gamble gamble;
+	std::chrono::seconds waitingTime(20s);
+	std::string strName;
+	int prediction;
+
+	auto start = chrono::high_resolution_clock::now();
+	while ( true ) {
+		auto end = std::chrono::high_resolution_clock::now();
+		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
+		
+			std::cout << "Enter name: ";
 	
-	gamble.MakePrediction("Alex1", 3);
-	Sleep(100);
-	gamble.MakePrediction("Alex2", 5);
-	Sleep(100);
-	gamble.MakePrediction("Alex3", 8);
-	Sleep(100);
-	gamble.MakePrediction("Alex5", 11);
-	Sleep(100);
-	gamble.MakePrediction("Alex6", 15);
-	Sleep(100);
-	gamble.MakePrediction("Alex7", 19);
+		end = std::chrono::high_resolution_clock::now();
+		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
+		
+			std::cin >> strName;
+		
+		end = std::chrono::high_resolution_clock::now();
+		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
+		
+			std::cout << "Enter prediction: ";
+		
+		end = std::chrono::high_resolution_clock::now();
+		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
+		
+			std::cin >> prediction;
 
-	Sleep(100);
+		end = std::chrono::high_resolution_clock::now();
+		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
+		
+			gamble.MakePrediction(strName.c_str(), prediction);
+		
+		end = std::chrono::high_resolution_clock::now();
+		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
+	}
 
-	gamble.allPredictions();
 	gamble.findAnAccuratePrediction();
-
-	Sleep(2000);
+	gamble.allPredictions();
 
 	DeleteCriticalSection(&criticalSection);
 
