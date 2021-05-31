@@ -1,0 +1,6 @@
+﻿  pch.cpp
+  calculator_dll.cpp
+  dllmain.cpp
+  Generating Code...
+     Creating library C:\Users\user\Desktop\System_programming_2\2_Jun\12_lib\calculator\Debug\calculator_dll.lib and object C:\Users\user\Desktop\System_programming_2\2_Jun\12_lib\calculator\Debug\calculator_dll.exp
+  calculator_dll.vcxproj -> C:\Users\user\Desktop\System_programming_2\2_Jun\12_lib\calculator\Debug\calculator_dll.dll
