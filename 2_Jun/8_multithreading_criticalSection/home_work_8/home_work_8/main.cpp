@@ -17,37 +17,37 @@ class Gamble;
 
 struct DataPrediction {
 	int predictionsValue = 0;
-	const char* name = "";
-	void(Gamble::*setPredictions)(const char* name, int predictionsValue);
+	std::string name = "";
+	std::map<std::string, int>* p_predictions;
 };
 
 class Gamble {
 
 public:
 
-	void setPredictions(const char* userName, int prediction) {
+	/*void setPredictions(const char* userName, int prediction) {
 		m_predictions.insert(std::pair<const char*, int>(userName, prediction));
-	}
+	}*/
 
 	Gamble() {
 		srand(static_cast<unsigned int>(time(0)));
 		m_hiddenNumber = rand() % 20 + 1;
 		std::cout << "prediction: " << m_hiddenNumber << std::endl;
-		m_dataPrediction.setPredictions = setPredictions;
+		m_dataPrediction.p_predictions = &m_predictions;
 	}
 
-	void MakePrediction(const char* userName, int prediction) {
+	void MakePrediction(std::string userName, int prediction) {
 
 		m_dataPrediction.predictionsValue = prediction;
 		m_dataPrediction.name = userName;
 
-		HANDLE thread = CreateThread(0, 0, ThreadStart, &m_dataPrediction, 0, 0);
+		HANDLE thread = CreateThread(0, 0, ThreadStart, this, 0, 0);
 	}
 
 	void findAnAccuratePrediction() {
 
-		std::map<const char*, int> bestPredictions;
-		std::pair<const char*, int> bestPrediction;
+		std::map<std::string, int> bestPredictions;
+		std::pair<std::string, int> bestPrediction;
 
 		int temp = 0;
 
@@ -74,7 +74,6 @@ public:
 		}
 		for (auto iter = bestPredictions.begin(); iter != bestPredictions.end(); iter++) {
 			cout << "best prediction: " << iter->first << ": " << iter->second << endl;
-			cout << endl;
 		}
 	}
 
@@ -88,18 +87,18 @@ public:
 
 private:
 
-	std::map<const char*, int> m_predictions;
+	std::map<std::string, int> m_predictions;
 	int m_hiddenNumber;
 };
 
 DWORD WINAPI ThreadStart(void* param) {
 	EnterCriticalSection(&criticalSection);
-
-	    DataPrediction* dataPrediction = static_cast<DataPrediction*>(param);
-		int value = dataPrediction->predictionsValue;
-		const char* name = dataPrediction->name;
-
-	    dataPrediction->setPredictions(name, value);
+		
+	    //DataPrediction* dataPrediction = static_cast<DataPrediction*>(param);
+		Gamble* gamble = static_cast<Gamble*>(param);
+		int value = gamble->m_dataPrediction.predictionsValue;
+		std::string name = gamble->m_dataPrediction.name;
+		gamble->m_dataPrediction.p_predictions->insert(std::pair<std::string, int>(name, value));
 
 	LeaveCriticalSection(&criticalSection);
 
@@ -110,40 +109,35 @@ int main() {
 
 	InitializeCriticalSection(&criticalSection);
 	Gamble gamble;
-	std::chrono::seconds waitingTime(20s);
+	std::chrono::seconds waitingTime(2s);
 	std::string strName;
-	int prediction;
+	int prediction = 0;
 
-	auto start = chrono::high_resolution_clock::now();
+	/*auto start = chrono::high_resolution_clock::now();
 	while ( true ) {
 		auto end = std::chrono::high_resolution_clock::now();
 		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
 		
 			std::cout << "Enter name: ";
-	
-		end = std::chrono::high_resolution_clock::now();
-		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
 		
-			std::cin >> strName;
-		
-		end = std::chrono::high_resolution_clock::now();
-		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
-		
+			//std::cin >> strName;
+			strName = "Alex";
+			
 			std::cout << "Enter prediction: ";
+			prediction = prediction + 1;
+			//std::cin >> prediction;
 		
-		end = std::chrono::high_resolution_clock::now();
-		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
-		
-			std::cin >> prediction;
+		gamble.MakePrediction(strName.c_str(), prediction);
+	}*/
 
-		end = std::chrono::high_resolution_clock::now();
-		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
-		
-			gamble.MakePrediction(strName.c_str(), prediction);
-		
-		end = std::chrono::high_resolution_clock::now();
-		if (std::chrono::duration_cast<std::chrono::seconds>(end - start) > waitingTime) { break; }
-	}
+	gamble.MakePrediction("Alex1", prediction++);
+	Sleep(100);
+	gamble.MakePrediction("Alex1", prediction++);
+	Sleep(100);
+	gamble.MakePrediction("Alex1", prediction++);
+	Sleep(100);
+	gamble.MakePrediction("Alex1", prediction++);
+	Sleep(100);
 
 	gamble.findAnAccuratePrediction();
 	gamble.allPredictions();
