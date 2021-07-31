@@ -8,7 +8,6 @@
 int main() {
 
     char* argv[4] = {"", "-la", "/", 0};
-
     int pid = fork();
 
     // child
