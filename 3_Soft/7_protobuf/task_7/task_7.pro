@@ -13,4 +13,4 @@ DISTFILES += \
 HEADERS += \
     proto_message/user_info.pb.h
 
-LIBS += -l protobuf
+LIBS += -lprotobuf

@@ -1,6 +1,22 @@
 syntax = "proto3";
 
-message UserInfo{
-	string name = 1;
-        uint32 age = 2;
+message Diploma {
+    string specialization = 1;
+    enum Degree {
+        WRONG_TYPE = 0;
+        BACHELOR = 1;
+        MASTER = 2;
+    };
+    Degree degree = 2;
+}
+
+message Notebook {
+    uint32 size = 1;
+}
+
+message UserInfo {
+    string name = 1;
+    uint32 age = 2;
+    Diploma diploma = 3;
+    repeated Notebook notebook = 4;
 }

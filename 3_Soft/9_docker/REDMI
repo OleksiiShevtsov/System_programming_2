@@ -1,0 +1,40 @@
+//on linux
+//install docker (-io)
+sudo apt install docker
+//or
+sudo apt-get install docker-ce docker-ce-cli containerd.io 
+
+//fix problem
+sudo usermod -a -G docker {username}
+newgrp docker 
+
+//chek docker
+docker ps -a
+
+//------------------------------------------------------
+//image ubuntu
+docker pull ubuntu
+
+//image
+docker images
+
+//in docker
+docker run -it ubuntu bash
+//exit in docker
+exit
+
+//------------------------------------------------------
+
+//build cont. 
+docker build .
+
+//run cont.
+docker run {id}
+
+//stop cont.
+docker stop {id}
+
+//delete images
+docker rmi -f $(docker images -a -q)
+
+
