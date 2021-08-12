@@ -1,2 +1,3 @@
-﻿  LeapYear.cpp
+﻿  Converter.cpp
+D:\Programming summary\System_programming_2\3_Soft\10_TDD\task_10\task_10\Converter.cpp(10,52): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
   task_10.vcxproj -> D:\Programming summary\System_programming_2\3_Soft\10_TDD\task_10\Debug\task_10.exe

@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Converter.cpp" />
     <ClCompile Include="FizzBuzz.cpp" />
     <ClCompile Include="LeapYear.cpp" />
     <ClCompile Include="main.cpp" />
