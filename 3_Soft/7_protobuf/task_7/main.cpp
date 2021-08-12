@@ -5,6 +5,7 @@
 int main()
 {
     //client
+<<<<<<< Updated upstream
     Diploma diploma;
     diploma.set_specialization("Dev");
     diploma.set_degree( Diploma_Degree_BACHELOR );
@@ -34,6 +35,22 @@ int main()
     for( int i = 0; i < serverUi.notebook_size(); i++ ){
         std::cout << serverUi.notebook(i).size() << std::endl;
     }
+=======
+    UserInfo ui;
+
+    ui.set_name("Alex");
+    ui.set_age(24);
+
+    //std::string s = ui.;
+
+
+    //server
+    //UserInfo uIserver;
+    //uIserver.MergePartialFromCodedStream(s);
+
+    //cout << uIserver.name() << endl;
+    //cout << uIserver.age() << endl;
+>>>>>>> Stashed changes
 
     return 0;
 }
